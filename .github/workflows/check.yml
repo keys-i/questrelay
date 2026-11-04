@@ -68,13 +68,31 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y build-essential clang cmake ninja-build pkg-config python3 python3-pip python3-venv
           fi
-      - uses: Swatinem/rust-cache@v2
+      - id: rust-version
+        run: echo "hash=$(rustc -Vv | sha256sum | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+      - id: backend-cache
+        uses: actions/cache/restore@v6
         with:
-          workspaces: backend -> target
-          cache-on-failure: true
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            backend/target
+          key: backend-v3-${{ runner.os }}-${{ runner.arch }}-${{ steps.rust-version.outputs.hash }}-${{ hashFiles('backend/Cargo.lock') }}
+          restore-keys: |
+            backend-v3-${{ runner.os }}-${{ runner.arch }}-${{ steps.rust-version.outputs.hash }}-
+            backend-${{ runner.os }}-${{ runner.arch }}-
       - run: cargo fmt --manifest-path backend/Cargo.toml -- --check
+      - run: cargo test --manifest-path backend/Cargo.toml --locked --no-run
+      - if: steps.backend-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            backend/target
+          key: ${{ steps.backend-cache.outputs.cache-primary-key }}
       - run: cargo test --manifest-path backend/Cargo.toml --locked
-      - run: cargo clippy --manifest-path backend/Cargo.toml --locked -- -D warnings
+      - run: cargo clippy --manifest-path backend/Cargo.toml --locked --no-deps -- -D warnings
 
   edge:
     runs-on: ubuntu-latest
