@@ -27,15 +27,21 @@ jobs:
           - language: javascript-typescript
             build-mode: none
           - language: go
-            build-mode: autobuild
+            build-mode: manual
     steps:
       - uses: actions/checkout@v7
+      - if: matrix.language == 'go'
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: quest/transport/go.mod
+          cache-dependency-path: quest/transport/go.sum
       - uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
-      - if: matrix.build-mode == 'autobuild'
-        uses: github/codeql-action/autobuild@v4
+      - if: matrix.language == 'go'
+        run: go test ./...
+        working-directory: quest/transport
       - uses: github/codeql-action/analyze@v4
         with:
           category: /language:${{ matrix.language }}
