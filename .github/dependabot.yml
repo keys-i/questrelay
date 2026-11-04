@@ -41,10 +41,6 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 3
-    ignore:
-      # OkHttp 5.5 requires unpublished Android API 37 packages
-      - dependency-name: com.squareup.okhttp3:okhttp
-        update-types: ['version-update:semver-major']
     groups:
       gradle-minor-and-patch:
         patterns: ['*']
