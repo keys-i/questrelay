@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -52,15 +53,20 @@ async function main() {
   });
 
   const webDist = join(root, "frontend/dist");
+  const indexHtml = await readFile(join(webDist, "index.html"), "utf8").catch(
+    () => undefined,
+  );
   app.use(express.static(webDist));
   app.get("*", (req, res, next) => {
-    if (req.path.startsWith("/api") || req.path.startsWith("/ws")) {
+    if (
+      !indexHtml ||
+      req.path.startsWith("/api") ||
+      req.path.startsWith("/ws")
+    ) {
       next();
       return;
     }
-    res.sendFile(join(webDist, "index.html"), (err) => {
-      if (err) next();
-    });
+    res.type("html").send(indexHtml);
   });
 
   const server = createServer(app);
