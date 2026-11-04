@@ -84,7 +84,7 @@ npm test
 npm run build
 ```
 
-Component-specific checks and toolchain versions are in the [contribution guide](.github/docs/CONTRIBUTING.md)
+Component-specific checks and toolchain versions are in the [contribution guide](.github/CONTRIBUTING.md)
 
 ## 📚 Reference
 
@@ -92,7 +92,7 @@ Component-specific checks and toolchain versions are in the [contribution guide]
 - [Cloudflare deployment](docs/CLOUDFLARE.md)
 - [Docker, LAN and server deployment](docs/LOCAL.md)
 - [Release history](docs/CHANGELOG.md)
-- [Security reporting](.github/docs/SECURITY.md)
-- [Code of Conduct](.github/docs/CODE_OF_CONDUCT.md)
+- [Security reporting](.github/SECURITY.md)
+- [Code of Conduct](.github/CODE_OF_CONDUCT.md)
 
 QuestRelay uses a [custom modified MIT-style licence](LICENSE). Commercial use and AI training require separate permission
