@@ -41,8 +41,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - run: |
-          sudo apt-get update
-          sudo apt-get install -y shellcheck
+          if ! command -v shellcheck >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y shellcheck
+          fi
           shellcheck tools/scripts/*.sh
           cp tools/config/.env.example .env
           docker compose -f tools/config/compose.yaml --project-directory . config --quiet
@@ -55,8 +57,10 @@ jobs:
         with:
           components: clippy, rustfmt
       - run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential clang cmake ninja-build pkg-config python3 python3-pip python3-venv
+          if ! command -v clang >/dev/null || ! command -v cmake >/dev/null || ! command -v ninja >/dev/null || ! command -v pkg-config >/dev/null || ! command -v python3 >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y build-essential clang cmake ninja-build pkg-config python3 python3-pip python3-venv
+          fi
       - uses: actions/cache@v6
         with:
           path: |
@@ -111,7 +115,16 @@ jobs:
           go-version-file: quest/transport/go.mod
           cache-dependency-path: quest/transport/go.sum
       - uses: android-actions/setup-android@v4
-      - run: sdkmanager 'platforms;android-35' 'build-tools;36.0.0' 'ndk;27.2.12479018'
+      - id: android-cache
+        uses: actions/cache@v6
+        with:
+          path: |
+            /usr/local/lib/android/sdk/platforms/android-35
+            /usr/local/lib/android/sdk/build-tools/36.0.0
+            /usr/local/lib/android/sdk/ndk/27.2.12479018
+          key: android-35-36.0.0-27.2.12479018-${{ runner.os }}-${{ runner.arch }}
+      - if: steps.android-cache.outputs.cache-hit != 'true'
+        run: sdkmanager 'platforms;android-35' 'build-tools;36.0.0' 'ndk;27.2.12479018'
       - run: go test ./...
         working-directory: quest/transport
       - run: ANDROID_NDK_HOME="$ANDROID_HOME/ndk/27.2.12479018" bash tools/scripts/build-transport.sh

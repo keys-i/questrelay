@@ -69,12 +69,9 @@ jobs:
       - id: audit-cache
         uses: actions/cache@v6
         with:
-          path: |
-            ~/.cargo/bin/cargo-audit
-            ~/.cargo/advisory-db
-          key: cargo-audit-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.github/workflows/security.yml', 'backend/Cargo.lock', 'backend/edge/Cargo.lock') }}
-          restore-keys: cargo-audit-${{ runner.os }}-${{ runner.arch }}-
+          path: ~/.cargo/bin/cargo-audit
+          key: cargo-audit-0.22.2-${{ runner.os }}-${{ runner.arch }}
       - if: steps.audit-cache.outputs.cache-hit != 'true'
-        run: cargo install cargo-audit --locked
+        run: cargo install cargo-audit --version 0.22.2 --locked
       - run: cargo audit --file backend/Cargo.lock
       - run: cargo audit --file backend/edge/Cargo.lock
