@@ -66,14 +66,10 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y build-essential clang cmake ninja-build pkg-config python3 python3-pip python3-venv
           fi
-      - uses: actions/cache@v6
+      - uses: Swatinem/rust-cache@v2
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            backend/target
-          key: backend-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('backend/Cargo.lock') }}
-          restore-keys: backend-${{ runner.os }}-${{ runner.arch }}-
+          workspaces: backend -> target
+          cache-on-failure: true
       - run: cargo fmt --manifest-path backend/Cargo.toml -- --check
       - run: cargo test --manifest-path backend/Cargo.toml --locked
       - run: cargo clippy --manifest-path backend/Cargo.toml --locked -- -D warnings
@@ -86,14 +82,10 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
           components: clippy, rustfmt
-      - uses: actions/cache@v6
+      - uses: Swatinem/rust-cache@v2
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            backend/edge/target
-          key: edge-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('backend/edge/Cargo.lock') }}
-          restore-keys: edge-${{ runner.os }}-${{ runner.arch }}-
+          workspaces: backend/edge -> target
+          cache-on-failure: true
       - run: cargo fmt --manifest-path backend/edge/Cargo.toml -- --check
       - run: cargo clippy --manifest-path backend/edge/Cargo.toml --locked --target wasm32-unknown-unknown -- -D warnings
       - run: cargo test --manifest-path backend/edge/Cargo.toml --locked
