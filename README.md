@@ -2,8 +2,8 @@
   <h1>QuestRelay</h1>
   <p><strong>Stream Meta Quest video and supported game audio to a shared browser room</strong></p>
   <p>
-    <a href="https://github.com/uqrealitylabs/questrelay/actions/workflows/check.yml"><img alt="Check status" src="https://github.com/uqrealitylabs/questrelay/actions/workflows/check.yml/badge.svg?branch=main"></a>
-    <a href="https://github.com/uqrealitylabs/questrelay/actions/workflows/security.yml"><img alt="Security status" src="https://github.com/uqrealitylabs/questrelay/actions/workflows/security.yml/badge.svg?branch=main"></a>
+    <a href="https://github.com/keys-i/questrelay/actions/workflows/check.yml"><img alt="Check status" src="https://github.com/keys-i/questrelay/actions/workflows/check.yml/badge.svg?branch=main"></a>
+    <a href="https://github.com/keys-i/questrelay/actions/workflows/security.yml"><img alt="Security status" src="https://github.com/keys-i/questrelay/actions/workflows/security.yml/badge.svg?branch=main"></a>
   </p>
   <img src="docs/assets/questrelay-poster.webp" alt="A capybara wearing a VR headset as three Quest feeds converge into one browser room" width="100%">
   <p>
