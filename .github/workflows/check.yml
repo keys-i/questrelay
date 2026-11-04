@@ -3,7 +3,12 @@ name: Check
 on:
   push:
     branches: [main]
+    paths-ignore: &community_files
+      - '.github/ACCESSIBILITY.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/pull_request_template.md'
   pull_request:
+    paths-ignore: *community_files
   workflow_call:
   workflow_dispatch:
 

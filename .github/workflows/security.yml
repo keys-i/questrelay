@@ -3,7 +3,12 @@ name: Security
 on:
   push:
     branches: [main]
+    paths-ignore: &community_files
+      - '.github/ACCESSIBILITY.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/pull_request_template.md'
   pull_request:
+    paths-ignore: *community_files
   schedule:
     - cron: '17 3 * * 1'
   workflow_dispatch:
