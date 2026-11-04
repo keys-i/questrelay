@@ -1,0 +1,8 @@
+[package]
+name = "random_color"
+version = "0.6.1"
+edition = "2018"
+license = "MIT"
+
+[dependencies]
+rand = "0.10.3"
