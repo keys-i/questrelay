@@ -32,7 +32,7 @@ cargo clippy --manifest-path backend/edge/Cargo.toml --locked --target wasm32-un
 cd quest/transport && go test ./...
 ```
 
-For a Quest app change, use JDK 17, Go 1.26, Gradle 9.6, Android SDK platform 35 and NDK `27.2.12479018`. Build the transport AAR before the APK:
+For a Quest app change, use JDK 17, Go 1.26, Gradle 9.6, Android SDK platform 37 and NDK `27.2.12479018`. Build the transport AAR before the APK:
 
 ```bash
 bash tools/scripts/build-transport.sh
