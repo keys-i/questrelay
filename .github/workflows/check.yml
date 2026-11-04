@@ -116,12 +116,12 @@ jobs:
         uses: actions/cache@v6
         with:
           path: |
-            /usr/local/lib/android/sdk/platforms/android-37
+            /usr/local/lib/android/sdk/platforms/android-35
             /usr/local/lib/android/sdk/build-tools/36.0.0
             /usr/local/lib/android/sdk/ndk/27.2.12479018
-          key: android-37-36.0.0-27.2.12479018-${{ runner.os }}-${{ runner.arch }}
+          key: android-35-36.0.0-27.2.12479018-${{ runner.os }}-${{ runner.arch }}
       - if: steps.android-cache.outputs.cache-hit != 'true'
-        run: sdkmanager 'platforms;android-37' 'build-tools;36.0.0' 'ndk;27.2.12479018'
+        run: sdkmanager 'platforms;android-35' 'build-tools;36.0.0' 'ndk;27.2.12479018'
       - run: go test ./...
         working-directory: quest/transport
       - run: ANDROID_NDK_HOME="$ANDROID_HOME/ndk/27.2.12479018" bash tools/scripts/build-transport.sh
