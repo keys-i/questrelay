@@ -27,6 +27,6 @@
     "source-map-js": "1.2.2"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.14"
+    "@biomejs/biome": "2.6.6"
   }
 }
