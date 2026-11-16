@@ -5,7 +5,6 @@ compatibility_date = "2026-09-30"
 workers_dev = false
 routes = [
   { pattern = "cast.keysi.dev", custom_domain = true },
-  { pattern = "cast.uqrealitylabs.com", custom_domain = true },
 ]
 
 [triggers]
