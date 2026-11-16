@@ -7,7 +7,7 @@
   </p>
   <img src="docs/assets/questrelay-poster.webp" alt="A capybara wearing a VR headset as three Quest feeds converge into one browser room" width="100%">
   <p>
-    <a href="https://cast.uqrealitylabs.com"><img alt="Open the hosted room" src="https://img.shields.io/badge/Open_the_hosted_room-5865F2?style=for-the-badge&logo=cloudflare&logoColor=white"></a>
+    <a href="https://cast.keysi.dev"><img alt="Open the hosted room" src="https://img.shields.io/badge/Open_the_hosted_room-5865F2?style=for-the-badge&logo=cloudflare&logoColor=white"></a>
     <a href="docs/ARCHITECTURE.md"><img alt="See how it works" src="https://img.shields.io/badge/See_how_it_works-24252D?style=for-the-badge&logo=readthedocs&logoColor=white"></a>
   </p>
 </div>

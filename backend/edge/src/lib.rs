@@ -5,6 +5,11 @@ mod site;
 use serde_json::{Value, json};
 use worker::{Context, Env, Method, Request, Response, Result};
 
+const API_DOCS: &str = include_str!("../../docs.html");
+const API_REFERENCE: &str = include_str!("../../reference.js");
+const OPENAPI: &str = include_str!("../openapi.json");
+const API_CSP: &str = "default-src 'none'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'";
+
 fn now() -> i64 {
     worker::js_sys::Date::now() as i64
 }
@@ -34,8 +39,52 @@ async fn read_json(req: &mut Request) -> Result<Value> {
         .map_err(|_| worker::Error::RustError("Invalid request: expected JSON".into()))
 }
 
+fn docs_asset(path: &str) -> Option<(&'static str, &'static str, &'static str)> {
+    match path {
+        "/api" | "/api/" | "/api/docs" => Some((API_DOCS, "text/html; charset=utf-8", API_CSP)),
+        "/api/reference.js" => Some((
+            API_REFERENCE,
+            "text/javascript; charset=utf-8",
+            "default-src 'none'; frame-ancestors 'none'",
+        )),
+        "/api/openapi.json" => Some((
+            OPENAPI,
+            "application/vnd.oai.openapi+json;version=3.1; charset=utf-8",
+            "default-src 'none'; frame-ancestors 'none'",
+        )),
+        _ => None,
+    }
+}
+
+fn docs_response(
+    req: &Request,
+    body: &'static str,
+    content_type: &str,
+    csp: &str,
+) -> Result<Response> {
+    if !matches!(req.method(), Method::Get | Method::Head) {
+        let mut response = fail(405, "Use GET or HEAD for API reference assets")?;
+        response.headers_mut().set("Allow", "GET, HEAD")?;
+        return Ok(response);
+    }
+    let mut response = if req.method() == Method::Head {
+        Response::empty()?
+    } else {
+        Response::ok(body)?
+    };
+    response.headers_mut().set("Content-Type", content_type)?;
+    response.headers_mut().set("Content-Security-Policy", csp)?;
+    response
+        .headers_mut()
+        .set("X-Content-Type-Options", "nosniff")?;
+    Ok(response)
+}
+
 async fn route(mut req: Request, env: Env) -> Result<Response> {
     let path = req.path();
+    if let Some((body, content_type, csp)) = docs_asset(&path) {
+        return docs_response(&req, body, content_type, csp);
+    }
     if path == "/health" {
         let ready = env.d1("DB").is_ok()
             && env.secret("SFU_APP_SECRET").is_ok()
@@ -125,6 +174,34 @@ async fn route(mut req: Request, env: Env) -> Result<Response> {
             }
         }
         _ => fail(404, "API endpoint not found"),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{API_REFERENCE, OPENAPI, docs_asset};
+
+    #[test]
+    fn api_reference_routes_and_contract_are_checked_in() {
+        assert!(docs_asset("/api").is_some());
+        assert!(docs_asset("/api/").is_some());
+        assert!(docs_asset("/api/openapi.json").is_some());
+        assert!(docs_asset("/api/unknown").is_none());
+        assert!(API_REFERENCE.contains("@scalar/api-reference@1.78.0/esm.js"));
+        assert!(API_REFERENCE.contains("#24252d"));
+        assert!(API_REFERENCE.contains("#5865f2"));
+
+        let contract: serde_json::Value = serde_json::from_str(OPENAPI).unwrap();
+        assert_eq!(contract["openapi"], "3.1.0");
+        for path in [
+            "/api/site",
+            "/api/livestream/{id}",
+            "/api/publisher/start",
+            "/api/viewer/join",
+            "/api/admin/state",
+        ] {
+            assert!(contract["paths"].get(path).is_some(), "missing {path}");
+        }
     }
 }
 

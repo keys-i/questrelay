@@ -2,7 +2,7 @@ https://{$QUESTRELAY_DOMAIN} {
     {$QUESTRELAY_TLS}
     encode zstd gzip
 
-    @backend path /api/* /ws/* /health
+    @backend path /api /api/* /ws/* /health
     handle @backend {
         reverse_proxy {$QUESTRELAY_UPSTREAM}
     }

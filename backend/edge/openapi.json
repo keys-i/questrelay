@@ -1,0 +1,296 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "QuestRelay API",
+    "version": "0.9.0",
+    "description": "Control and signalling API for the hosted QuestRelay casting service"
+  },
+  "servers": [
+    { "url": "https://cast.keysi.dev", "description": "Hosted service" }
+  ],
+  "tags": [
+    { "name": "Rooms", "description": "Public room discovery and access" },
+    {
+      "name": "Publishers",
+      "description": "Authenticated Meta Quest publishing sessions"
+    },
+    {
+      "name": "Viewers",
+      "description": "Short-lived browser viewing sessions"
+    },
+    {
+      "name": "Admin",
+      "description": "Operator-only controls protected by an HTTP-only session cookie"
+    }
+  ],
+  "paths": {
+    "/api/site": {
+      "get": {
+        "tags": ["Rooms"],
+        "summary": "Read public lounge settings",
+        "responses": { "200": { "$ref": "#/components/responses/Json" } }
+      }
+    },
+    "/api/livestream/{id}": {
+      "get": {
+        "tags": ["Rooms"],
+        "summary": "Read public room settings",
+        "parameters": [{ "$ref": "#/components/parameters/RoomId" }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/Json" },
+          "404": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/livestream/{id}/ticket": {
+      "post": {
+        "tags": ["Rooms"],
+        "summary": "Exchange a room access code for a short-lived viewer ticket",
+        "parameters": [{ "$ref": "#/components/parameters/RoomId" }],
+        "requestBody": { "$ref": "#/components/requestBodies/Json" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Json" },
+          "403": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/publisher/start": {
+      "post": {
+        "tags": ["Publishers"],
+        "summary": "Start an authenticated headset publishing session",
+        "description": "The JSON body carries the publisher key, headset ID, media track IDs and WebRTC offer",
+        "requestBody": { "$ref": "#/components/requestBodies/Json" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Json" },
+          "400": { "$ref": "#/components/responses/Error" },
+          "401": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/publisher/heartbeat": {
+      "post": {
+        "tags": ["Publishers"],
+        "summary": "Renew a publishing lease and report capture statistics",
+        "requestBody": { "$ref": "#/components/requestBodies/Json" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Json" },
+          "401": { "$ref": "#/components/responses/Error" },
+          "404": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/publisher/stop": {
+      "post": {
+        "tags": ["Publishers"],
+        "summary": "Stop an authenticated headset publishing session",
+        "requestBody": { "$ref": "#/components/requestBodies/Json" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Json" },
+          "401": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/viewer/join": {
+      "post": {
+        "tags": ["Viewers"],
+        "summary": "Open a viewer session from a room ticket",
+        "requestBody": { "$ref": "#/components/requestBodies/Json" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Json" },
+          "401": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/viewer/feeds": {
+      "post": {
+        "tags": ["Viewers"],
+        "summary": "List live feeds visible to a viewer session",
+        "requestBody": { "$ref": "#/components/requestBodies/Json" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Json" },
+          "401": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/viewer/watch": {
+      "post": {
+        "tags": ["Viewers"],
+        "summary": "Create a WebRTC subscription for one headset feed",
+        "requestBody": { "$ref": "#/components/requestBodies/Json" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Json" },
+          "401": { "$ref": "#/components/responses/Error" },
+          "404": { "$ref": "#/components/responses/Error" },
+          "409": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/viewer/answer": {
+      "post": {
+        "tags": ["Viewers"],
+        "summary": "Complete WebRTC negotiation for a viewer subscription",
+        "requestBody": { "$ref": "#/components/requestBodies/Json" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Json" },
+          "400": { "$ref": "#/components/responses/Error" },
+          "403": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/viewer/leave": {
+      "post": {
+        "tags": ["Viewers"],
+        "summary": "Close a viewer subscription",
+        "requestBody": { "$ref": "#/components/requestBodies/Json" },
+        "responses": { "200": { "$ref": "#/components/responses/Json" } }
+      }
+    },
+    "/api/admin/login": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Create an operator session from the admin key",
+        "requestBody": { "$ref": "#/components/requestBodies/Json" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Json" },
+          "401": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/admin/logout": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "End the current operator session",
+        "security": [{ "adminCookie": [] }],
+        "responses": { "200": { "$ref": "#/components/responses/Json" } }
+      }
+    },
+    "/api/admin/auth": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Read authentication capabilities",
+        "responses": { "200": { "$ref": "#/components/responses/Json" } }
+      }
+    },
+    "/api/admin/state": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Read operator settings, rooms and relay state",
+        "security": [{ "adminCookie": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/Json" },
+          "401": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/admin/publisher-key": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Read the headset publisher key",
+        "description": "This sensitive response is only available to an authenticated operator",
+        "security": [{ "adminCookie": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/Json" },
+          "401": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/admin/settings": {
+      "put": {
+        "tags": ["Admin"],
+        "summary": "Update lounge settings",
+        "security": [{ "adminCookie": [] }],
+        "requestBody": { "$ref": "#/components/requestBodies/Json" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Json" },
+          "401": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/admin/rooms/{id}": {
+      "put": {
+        "tags": ["Admin"],
+        "summary": "Update one room",
+        "security": [{ "adminCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/RoomId" }],
+        "requestBody": { "$ref": "#/components/requestBodies/Json" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Json" },
+          "401": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/admin/headsets/{id}/media": {
+      "put": {
+        "tags": ["Admin"],
+        "summary": "Enable or pause a headset's video and audio",
+        "security": [{ "adminCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/HeadsetId" }],
+        "requestBody": { "$ref": "#/components/requestBodies/Json" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Json" },
+          "400": { "$ref": "#/components/responses/Error" },
+          "401": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "adminCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "qr_admin",
+        "description": "HTTP-only operator session issued by the login endpoint"
+      }
+    },
+    "parameters": {
+      "RoomId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string", "minLength": 1, "maxLength": 64 }
+      },
+      "HeadsetId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string", "minLength": 1, "maxLength": 64 }
+      }
+    },
+    "requestBodies": {
+      "Json": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": { "type": "object", "additionalProperties": true }
+          }
+        }
+      }
+    },
+    "responses": {
+      "Json": {
+        "description": "Successful JSON response",
+        "content": {
+          "application/json": {
+            "schema": { "type": "object", "additionalProperties": true }
+          }
+        }
+      },
+      "Error": {
+        "description": "JSON error response",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": ["error"],
+        "properties": { "error": { "type": "string" } }
+      }
+    }
+  }
+}

@@ -122,7 +122,7 @@ case $1 in
       echo 'QUESTRELAY_PUBLISH_KEY in .env must be at least 32 characters' >&2
       exit 2
     }
-    install_headset "$2" 'https://cast.uqrealitylabs.com' "$publisher_key"
+    install_headset "$2" 'https://cast.keysi.dev' "$publisher_key"
     exit 0
     ;;
   adb)

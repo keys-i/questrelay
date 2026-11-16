@@ -3,7 +3,10 @@ account_id = "ca120265a1ff5ecd9af28d2cf18e4789"
 main = "build/index.js"
 compatibility_date = "2026-09-30"
 workers_dev = false
-routes = [{ pattern = "cast.uqrealitylabs.com", custom_domain = true }]
+routes = [
+  { pattern = "cast.keysi.dev", custom_domain = true },
+  { pattern = "cast.uqrealitylabs.com", custom_domain = true },
+]
 
 [triggers]
 crons = ["0 4 * * *"]
@@ -15,7 +18,7 @@ command = "worker-build --release"
 directory = "../../frontend/dist"
 binding = "ASSETS"
 not_found_handling = "single-page-application"
-run_worker_first = ["/api/*", "/health"]
+run_worker_first = ["/api", "/api/*", "/health"]
 
 [[d1_databases]]
 binding = "DB"

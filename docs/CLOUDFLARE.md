@@ -26,7 +26,7 @@ npx wrangler d1 create questrelay-edge
 
 Put the returned D1 database ID in [`backend/edge/wrangler.toml`](../backend/edge/wrangler.toml). Create a Serverless SFU app in the Cloudflare dashboard and put its **App ID** in the same file as `SFU_APP_ID`. The **App Secret** stays out of Git and is entered through Wrangler
 
-The Cloudflare account is already configured with a D1 database and a Worker named `questrelay`. Its address is `https://cast.uqrealitylabs.com`
+The Cloudflare account is already configured with a D1 database and a Worker named `questrelay`. Its canonical address is `https://cast.keysi.dev`; the earlier `https://cast.uqrealitylabs.com` address remains available during migration
 
 ## Set the three secrets
 
@@ -48,7 +48,7 @@ Run the schema step once for a new D1 database, then use the same script without
 
 ```bash
 tools/scripts/deploy.sh cf --init-db
-curl -f https://cast.uqrealitylabs.com/health
+curl -f https://cast.keysi.dev/health
 ```
 
 `/health` returns `503` until all three secrets are present. Once it returns `200`, open `/admin` and sign in with the admin key. The public lounge is at `/`, and each connected headset gets a short `/livestream/<id>` link that an admin can make public or protect with an access code
@@ -62,7 +62,7 @@ tools/scripts/deploy.sh adb devices
 tools/scripts/deploy.sh headset YOUR_ADB_ID
 ```
 
-Repeat `headset` with each Quest's own ADB ID. The command builds and installs the debug app, saves `https://cast.uqrealitylabs.com` and the publisher key from `.env`, then opens the app ready to test. Each headset keeps its generated distinct name. Use **Test relay**, then start sharing and approve the screen and audio capture prompts. A release-channel install without Developer Mode requires a signed APK and Meta distribution approval, which is separate from this USB test
+Repeat `headset` with each Quest's own ADB ID. The command builds and installs the debug app, saves `https://cast.keysi.dev` and the publisher key from `.env`, then opens the app ready to test. Each headset keeps its generated distinct name. Use **Test relay**, then start sharing and approve the screen and audio capture prompts. A release-channel install without Developer Mode requires a signed APK and Meta distribution approval, which is separate from this USB test
 
 ## Free-tier and test limits
 

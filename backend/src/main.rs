@@ -22,6 +22,11 @@ use tokio::net::TcpListener;
 use tokio::time::{interval, timeout};
 use webauthn_rs::prelude::{PublicKeyCredential, RegisterPublicKeyCredential, Uuid};
 
+const API_DOCS: &str = include_str!("../docs.html");
+const API_REFERENCE: &str = include_str!("../reference.js");
+const OPENAPI: &str = include_str!("../edge/openapi.json");
+const API_CSP: &str = "default-src 'none'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'";
+
 #[tokio::main]
 async fn main() -> Result<()> {
     let config = config::Config::from_env()?;
@@ -36,6 +41,11 @@ async fn main() -> Result<()> {
     let app = Router::new()
         .route("/health", get(health))
         .route("/ws/relay", get(upgrade))
+        .route("/api", get(api_docs))
+        .route("/api/", get(api_docs))
+        .route("/api/docs", get(api_docs))
+        .route("/api/reference.js", get(api_reference))
+        .route("/api/openapi.json", get(openapi))
         .route("/api/site", get(site_info))
         .route("/api/livestream/{id}", get(room))
         .route("/api/livestream/{id}/ticket", post(ticket))
@@ -88,6 +98,42 @@ struct AppState {
 }
 
 type ApiError = (StatusCode, Json<Value>);
+
+fn api_asset(
+    body: &'static str,
+    content_type: &'static str,
+    csp: &'static str,
+) -> impl IntoResponse {
+    (
+        [
+            (header::CONTENT_TYPE, content_type),
+            (header::CACHE_CONTROL, "public, max-age=3600"),
+            (header::CONTENT_SECURITY_POLICY, csp),
+            (header::X_CONTENT_TYPE_OPTIONS, "nosniff"),
+        ],
+        body,
+    )
+}
+
+async fn api_docs() -> impl IntoResponse {
+    api_asset(API_DOCS, "text/html; charset=utf-8", API_CSP)
+}
+
+async fn api_reference() -> impl IntoResponse {
+    api_asset(
+        API_REFERENCE,
+        "text/javascript; charset=utf-8",
+        "default-src 'none'; frame-ancestors 'none'",
+    )
+}
+
+async fn openapi() -> impl IntoResponse {
+    api_asset(
+        OPENAPI,
+        "application/vnd.oai.openapi+json;version=3.1; charset=utf-8",
+        "default-src 'none'; frame-ancestors 'none'",
+    )
+}
 
 fn api_error(status: StatusCode, message: &str) -> ApiError {
     (status, Json(json!({"error": message})))
@@ -607,4 +653,17 @@ async fn shutdown() {
 #[cfg(not(unix))]
 async fn shutdown() {
     let _ = tokio::signal::ctrl_c().await;
+}
+
+#[cfg(test)]
+mod docs_tests {
+    use super::{API_REFERENCE, OPENAPI};
+
+    #[test]
+    fn api_reference_assets_are_valid() {
+        assert!(API_REFERENCE.contains("@scalar/api-reference@1.78.0/esm.js"));
+        assert!(API_REFERENCE.contains("#24252d"));
+        let contract: serde_json::Value = serde_json::from_str(OPENAPI).unwrap();
+        assert_eq!(contract["openapi"], "3.1.0");
+    }
 }
