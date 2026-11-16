@@ -57,7 +57,7 @@ case $1 in
     shift
     if (( $# > 1 )) || [[ ${1:-} != '' && ${1:-} != --init-db ]]; then usage; fi
     if ! command -v worker-build >/dev/null; then
-      echo 'Install worker-build 0.8.7 with cargo install worker-build --version 0.8.7 --locked' >&2
+      echo 'Install worker-build 0.9.0 with cargo install worker-build --version 0.9.0 --locked' >&2
       exit 1
     fi
     cd "$root"

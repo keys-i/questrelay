@@ -14,12 +14,12 @@ flowchart LR
 
 ## Before the first deploy
 
-You need a Cloudflare account with Workers, D1 and a Serverless SFU app, plus Node.js 22+, Rust with the `wasm32-unknown-unknown` target and `worker-build` 0.8.7 on your build machine
+You need a Cloudflare account with Workers, D1 and a Serverless SFU app, plus Node.js 22+, Rust with the `wasm32-unknown-unknown` target and `worker-build` 0.9.0 on your build machine
 
 ```bash
 npm ci
 rustup target add wasm32-unknown-unknown
-cargo install worker-build --version 0.8.7 --locked
+cargo install worker-build --version 0.9.0 --locked
 npx wrangler login
 npx wrangler d1 create questrelay-edge
 ```

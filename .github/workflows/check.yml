@@ -113,9 +113,9 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.cargo/bin/worker-build
-          key: worker-build-0.8.7-${{ runner.os }}-${{ runner.arch }}
+          key: worker-build-0.9.0-${{ runner.os }}-${{ runner.arch }}
       - if: steps.worker-cache.outputs.cache-hit != 'true'
-        run: cargo install worker-build --version 0.8.7 --locked
+        run: cargo install worker-build --version 0.9.0 --locked
       - run: worker-build --release
         working-directory: backend/edge
 
